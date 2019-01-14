@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+		<style>
+.button {
+  display: inline-block;
+  padding: 15px 25px;
+  font-size: 24px;
+  cursor: pointer;
+  text-align: right;
+  position: absolute;
+  right:0;
+  bottom:0;
+  text-decoration: none;
+  outline: none;
+  color: black;
+  background-color: #00BBFF;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+  font-weight: bold;
+}
+
+.button:hover {background-color: #3e8e41}
+
+.button:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+</style>
+    <meta charset="utf-8">
+    <title>TOP-10 Business Women</title>
+	<link href='https://fonts.googleapis.com/css?family=Merienda' rel='stylesheet'>
+    <style type="text/css">
+    text{
+        font-family: 'Merienda';
+		font-weight: bold;
+        font-size:15px;
+        pointer-events:none;
+    }
+    #chart{
+        position:absolute;
+        width:500px;
+        height:500px;
+        top:70px;
+        left:250px;
+		bottom:25px;
+		right:50px;
+    }
+    #info{
+        position: absolute;
+        width:400px;
+        height:500px;
+        top:0;
+        left:520px;
+    }
+    #info h1{
+        font-size: 30px;
+        font-weight: bold;
+        font-family: 'Merienda';
+        position: absolute;
+        padding: 0;
+        margin: 0;
+        top:70%;
+		left:300px;
+        -webkit-transform:translate(0,-50%);
+                transform:translate(0,-50%);
+    }
+		
+	body 
+	 {
+         background-image:url("http://newevolutiondesigns.com/images/freebies/white-wallpaper-24.jpg");
+         height: 700%;
+		 top:0;
+		 bottom:0;
+         background-repeat: no-repeat;
+         background-size: cover;
+		
+		}
+    </style>
+    
+</head>
+<body>
+	
+	
+	<h1  style="text-align:center;color:darkblue;"> WHEEL OF WONDER WOMEN IN BUSINESS </h1> 
+	<img src="girl.jpg" alt="Trulli" height="400px" left="100px" align="bottom">
+    <div id="chart"></div>
+    <div id="info"><h1></h1></div>
+    
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+        var padding = {top:20, right:40, bottom:0, left:0},
+            w = 500 - padding.left - padding.right,
+            h = 500 - padding.top  - padding.bottom,
+            r = Math.min(w, h)/2,
+            rotation = 0,
+            oldrotation = 0,
+            picked = 100000,
+            oldpick = [],
+            color = d3.scale.category20();
+           
+        var data = [
+                    {"label":"MARRY BARRA",  "value":1,  "info":"Chairman and CEO, General Motors"}, 
+                    {"label":"INDRA NOOYI",  "value":1,  "info":"Chairman and CEO, PepsiCo"}, 
+                    {"label":"MARILLYN HEWSON",  "value":1,  "info":"Chairman, President, and CEO, Lockheed Martin"},
+                    {"label":"ABIGAIL JOHNSON",  "value":1,  "info":"President and CEO, Fidelity Investments"}, 
+                    {"label":"SHERYL SANDBERG",  "value":1,  "info":"COO, Facebook"},
+                    {"label":"GINNI ROMETTY",  "value":1,  "info":"Chairman, President, and CEO, IBM"}, 
+                    {"label":"MEG WHITMAN",  "value":1,  "info":"CEO, Hewlett Packard Enterprise"}, 
+                    {"label":"SAFRA CATZ",  "value":1,  "info":"Co-CEO, Oracle"}, 
+                    {"label":"PHEBE NOVAKOVIC",  "value":1,"info":"Chairman and CEO, General Dynamics "}, 
+                    {"label":"RUTH PORAT", "value":1, "info":"SVP and CFO, Google, Alphabet"}
+                    ];
+        var svg = d3.select('#chart')
+            .append("svg")
+            .data([data])
+            .attr("width",  w + padding.left + padding.right)
+            .attr("height", h + padding.top + padding.bottom);
+        var container = svg.append("g")
+            .attr("class", "chartholder")
+            .attr("transform", "translate(" + (w/2 + padding.left) + "," + (h/2 + padding.top) + ")");
+        var vis = container
+            .append("g");
+            
+        var pie = d3.layout.pie().sort(null).value(function(d){return 1;});
+      
+        var arc = d3.svg.arc().outerRadius(r);
+        
+        var arcs = vis.selectAll("g.slice")
+            .data(pie)
+            .enter()
+            .append("g")
+            .attr("class", "slice");
+            
+        arcs.append("path")
+            .attr("fill", function(d, i){ return color(i); })
+            .attr("d", function (d) { return arc(d); });
+        
+        arcs.append("text").attr("transform", function(d){
+                d.innerRadius = 0;
+                d.outerRadius = r;
+                d.angle = (d.startAngle + d.endAngle)/2;
+                return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")translate(" + (d.outerRadius -10) +")";
+            })
+            .attr("text-anchor", "end")
+            .text( function(d, i) {
+                return data[i].label;
+            });
+        container.on("click", spin);
+        function spin(d){
+            
+            container.on("click", null);
+           
+            console.log("OldPick: " + oldpick.length, "Data length: " + data.length);
+            if(oldpick.length == data.length){
+                console.log("done");
+                container.on("click", null);
+                return;
+            }
+            var  ps       = 360/data.length,
+                 pieslice = Math.round(1440/data.length),
+                 rng      = Math.floor((Math.random() * 1440) + 360);
+                
+            rotation = (Math.round(rng / ps) * ps);
+            
+            picked = Math.round(data.length - (rotation % 360)/ps);
+            picked = picked >= data.length ? (picked % data.length) : picked;
+            if(oldpick.indexOf(picked) !== -1){
+                d3.select(this).call(spin);
+                return;
+            } else {
+                oldpick.push(picked);
+            }
+            rotation += 90 - Math.round(ps/2);
+            vis.transition()
+                .duration(3000)
+                .attrTween("transform", rotTween)
+                .each("end", function(){
+                   
+                    d3.select(".slice:nth-child(" + (picked + 1) + ") path")
+                        .attr("fill", "#111");
+             
+                    d3.select("#info h1")
+                        .text(data[picked].info);
+                    oldrotation = rotation;
+                
+                    container.on("click", spin);
+                });
+        }
+        //make arrow
+        svg.append("g")
+            .attr("transform", "translate(" + (w + padding.left + padding.right) + "," + ((h/2)+padding.top) + ")")
+            .append("path")
+            .attr("d", "M-" + (r*.15) + ",0L0," + (r*.05) + "L0,-" + (r*.05) + "Z")
+            .style({"fill":"black"});
+        //draw spin circle
+        container.append("circle")
+            .attr("cx", 0)
+            .attr("cy", 0)
+            .attr("r", 60)
+            .style({"fill":"white","cursor":"pointer"});
+        //spin text
+        container.append("text")
+            .attr("x", 0)
+            .attr("y", 15)
+            .attr("text-anchor", "middle")
+            .text("SPIN")
+            .style({"font-weight":"bold", "font-size":"30px"});
+        
+        
+        function rotTween(to) {
+          var i = d3.interpolate(oldrotation % 360, rotation);
+          return function(t) {
+            return "rotate(" + i(t) + ")";
+          };
+        }
+        
+        
+        function getRandomNumbers(){
+            var array = new Uint16Array(1000);
+            var scale = d3.scale.linear().range([360, 1440]).domain([0, 100000]);
+            if(window.hasOwnProperty("crypto") && typeof window.crypto.getRandomValues === "function"){
+                window.crypto.getRandomValues(array);
+                console.log("works");
+            } else {
+                
+                for(var i=0; i < 1000; i++){
+                    array[i] = Math.floor(Math.random() * 100000) + 1;
+                }
+            }
+            return array;
+        }
+    </script>
+	<button class="button" id="myButton" style="float: right;">Test your power</button>
+
+<script type="text/javascript">
+    document.getElementById("myButton").onclick = function ()
+	{
+        location.href = "quiz/indexq.html";
+    };
+</script>
+</body>
+</html>
